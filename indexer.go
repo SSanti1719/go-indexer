@@ -29,11 +29,12 @@ var (
 	sem         = make(chan struct{}, 3) // Crear un canal semáforo con capacidad 7
 	numCores    = runtime.NumCPU()
 	dir         = os.Getenv("ZINCSEARCH_FILES_DIR")
-	indexName   = os.Getenv("ZINCSEARCH_INDEX")
-	user        = os.Getenv("ZINC_FIRST_ADMIN_USER")
-	password    = os.Getenv("ZINC_FIRST_ADMIN_PASSWORD")
-	host        = fmt.Sprintf(`http://%s:%s`, os.Getenv("ZINCSEARCH_IP"), os.Getenv("ZINCSEARCH_PORT"))
-	client      = &http.Client{}
+	// dir       = "C:/Users/Asus/Documents/Technical_test/Datos de prueba/test3"
+	indexName = os.Getenv("ZINCSEARCH_INDEX")
+	user      = os.Getenv("ZINC_FIRST_ADMIN_USER")
+	password  = os.Getenv("ZINC_FIRST_ADMIN_PASSWORD")
+	host      = fmt.Sprintf(`http://%s:%s`, os.Getenv("ZINCSEARCH_IP"), os.Getenv("ZINCSEARCH_PORT"))
+	client    = &http.Client{}
 )
 
 func main() {
@@ -183,11 +184,14 @@ func contentParseToJson(path string) ([]byte, error) {
 		return nil, err
 	}
 
+	date, _ := time.Parse("Mon, 2 Jan 2006 15:04:05 -0700 (MST)", header.Get("Date"))
+	// fmt.Println(err2)
 	data := types.Email{
-		From:      header.Get("From"),
-		To:        header.Get("To"),
-		Subject:   header.Get("Subject"),
-		Date:      header.Get("Date"),
+		From:    header.Get("From"),
+		To:      header.Get("To"),
+		Subject: header.Get("Subject"),
+		Date:    date,
+		// Date:      header.Get("Date"),
 		MessageId: header.Get("Message-ID"),
 		Content:   strconv.QuoteToASCII(string(content)),
 	}
@@ -253,9 +257,10 @@ func createIndex() {
                     "store": true,
                     "highlightable": true
                 },"date": {
-                    "type": "text",
+                    "type": "date",
                     "index": true,
                     "store": true,
+					"format": "2006-01-02T15:04:05Z07:00",
                     "highlightable": true
                 },"subject": {
                     "type": "text",
